@@ -9,68 +9,74 @@
 #include <errno.h>
 #include <arpa/inet.h> 
 
+int port = 5000;
+#define SIZE 1024
+
 static void print_error_and_exit(const char* api_name) {
     perror(api_name);
     exit(EXIT_FAILURE);
 }
 
+static void write_all(int sockfd) {
+  char msg[] = "hello\n";
+  int position = 0;
+  int count = sizeof(msg);
+  int ret;
+  while (position < count) {
+    ret = write(sockfd, msg + position, count - position);
+    if (ret == -1) {
+      print_error_and_exit("write");
+    }
+    position += ret;
+  }
+}
+
+static void read_all(int sockfd) {
+  int position = 0;
+  int ret;
+  char buf[SIZE] = {0};
+  while ((ret = read(sockfd, buf + position, SIZE - position)) > 0) {
+      position += ret;
+  }
+
+  if (ret == -1) {
+    print_error_and_exit("read");
+  }
+  buf[position] = 0;
+  printf("%s", buf);
+}
+
 int main(int argc, char *argv[])
 {
   int sockfd = 0;
-  char buf[1024];
   struct sockaddr_in serv_addr; 
 
   if (argc != 2) {
-    printf("Usage: %s <ip of server> \n",argv[0]);
-    return 1;
+    fprintf(stderr, "Usage: %s <ip of server> \n",argv[0]);
+    return EXIT_FAILURE;
   } 
 
-  if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-    printf("Error : Could not create socket \n");
-    return 1;
+  if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
+    print_error_and_exit("socket");
   } 
 
   memset(&serv_addr, 0, sizeof(serv_addr)); 
   serv_addr.sin_family = AF_INET;
-  serv_addr.sin_port = htons(5000); 
-  if (inet_pton(AF_INET, argv[1], &serv_addr.sin_addr) <= 0) {
-    perror("inet_pton error occured\n");
-    return 1;
+  serv_addr.sin_port = htons(port); 
+  if (inet_pton(AF_INET, argv[1], &serv_addr.sin_addr) != 1) {
+    print_error_and_exit("inet_pton");
   } 
 
-  if (connect(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) {
-    printf("Error : Connect Failed \n");
-    return 1;
+  if (connect(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) == -1) {
+    print_error_and_exit("connect");
   } 
 
-  if (write(sockfd, "abc\n", 4) != 4) {
-    perror("write error");
-    return 1;
+  write_all(sockfd);
+  read_all(sockfd);
+
+
+  if (close(sockfd) == -1) {
+    print_error_and_exit("close");
   }
-
-  int copy;
-  if ((copy = dup(sockfd)) == -1) {
-    printf("Error: dup error\n");
-    return 1;
-  }
-
-  int i = 0;
-  memset(buf, 0,sizeof(buf));
-  while ((i = read(sockfd, buf, sizeof(buf)-1)) > 0) {
-    buf[i] = 0;
-    if(fputs(buf, stdout) == EOF) {
-      printf("Error : Fputs error\n");
-    }
-  } 
-
-  if (i < 0) {
-    printf("Read error \n");
-  } 
-
-
-  printf("Sleeping...\n");
-  sleep(10 * 60);
-  printf("Wake up");
-
   return 0;
 }
