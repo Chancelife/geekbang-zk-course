@@ -67,6 +67,12 @@ int main(int argc, char *argv[])
     print_error_and_exit("connect");
   } 
 
+  int seconds = 10;
+  printf("sleeping for %d seconds\n", seconds);
+  if (sleep(10) != 0) {
+    fprintf(stderr, "interrupted by a signal\n");
+    return EXIT_FAILURE;
+  }
   write_all(sockfd);
   read_all(sockfd);
 
