@@ -19,7 +19,9 @@ static void print_error_and_exit(const char* api_name) {
 static void echo(int sockfd) {
   char buf[SIZE] = {0};
   while (1) {
+    printf("reading\n");
     int received = read(sockfd, buf, SIZE);
+    printf("read %d bytes\n", received);
     if (received == 0) {
       break;
     }
@@ -48,10 +50,10 @@ int main(int argc, char *argv[]) {
     print_error_and_exit("socket");
   }
 
-  /*int reuse = 1;*/
-  /*if (setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse)) == -1) {*/
-  /*  print_error_and_exit("setsockopt");*/
-  /*}*/
+  int reuse = 1;
+  if (setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse)) == -1) {
+    print_error_and_exit("setsockopt");
+  }
 
   struct sockaddr_in serv_addr = {0}; 
   serv_addr.sin_family = AF_INET;
@@ -67,6 +69,7 @@ int main(int argc, char *argv[]) {
   printf("listened\n");
 
   int connfd;
+  printf("accepting\n");
   if ((connfd = accept(listenfd, (struct sockaddr*) NULL, NULL)) == -1) {
     print_error_and_exit("accept");
   }
