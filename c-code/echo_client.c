@@ -9,6 +9,11 @@
 #include <errno.h>
 #include <arpa/inet.h> 
 
+static void print_error_and_exit(const char* api_name) {
+    perror(api_name);
+    exit(EXIT_FAILURE);
+}
+
 int main(int argc, char *argv[])
 {
   int sockfd = 0;
