@@ -1,9 +1,12 @@
 package org.yao.socket;
 
+import com.google.common.io.Closeables;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -14,27 +17,37 @@ import java.net.Socket;
  */
 public class EchoServer {
   public static void main(String[] args) throws IOException {
-
     if (args.length != 1) {
       System.err.println("Usage: java EchoServer <port number>");
       System.exit(1);
     }
-    int portNumber = Integer.parseInt(args[0]);
-    try (ServerSocket serverSocket = new ServerSocket(Integer.parseInt(args[0]));
-        Socket clientSocket = serverSocket.accept();
-        PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-        BufferedReader in =
-            new BufferedReader(new InputStreamReader(clientSocket.getInputStream())); ) {
-      String inputLine;
-      while ((inputLine = in.readLine()) != null) {
-        out.println(inputLine);
+    int port = Integer.parseInt(args[0]);
+    ServerSocket serverSocket = null;
+    Socket socket = null;
+    PrintWriter out = null;
+    BufferedReader in = null;
+    try {
+      // Method 1
+      // serverSocket = new ServerSocket(Integer.parseInt(args[0]));
+
+      // Method 2
+      serverSocket = new ServerSocket();
+      serverSocket.setReuseAddress(true);
+      InetSocketAddress address = new InetSocketAddress(port);
+      serverSocket.bind(address);
+
+      socket = serverSocket.accept();
+      out = new PrintWriter(socket.getOutputStream(), true);
+      in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+      String msg;
+      while ((msg = in.readLine()) != null) {
+        out.println(msg);
       }
-    } catch (IOException e) {
-      System.out.println(
-          "Exception caught when trying to listen on port "
-              + portNumber
-              + " or listening for a connection");
-      System.out.println(e.getMessage());
+    } finally {
+      Closeables.close(out, false);
+      Closeables.close(in, false);
+      Closeables.close(socket, false);
+      Closeables.close(serverSocket, false);
     }
   }
 }
