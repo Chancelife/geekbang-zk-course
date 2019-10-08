@@ -28,7 +28,7 @@ static void echo(int sockfd) {
     }
 
     buf[received] = 0;
-    printf("msg: %s", buf);
+    /*printf("msg: %s", buf);*/
 
     int position = 0;
     int ret;

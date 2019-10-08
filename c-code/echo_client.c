@@ -32,20 +32,14 @@ static void write_all(int sockfd) {
 }
 
 static void read_all(int sockfd) {
-  printf("111\n");
-  int position = 0;
   int ret;
   char buf[SIZE] = {0};
-  while ((ret = read(sockfd, buf + position, SIZE - position)) > 0) {
-    printf("read %d\n", ret);
-    position += ret;
+  while ((ret = read(sockfd, buf, SIZE)) > 0) {
+    printf("%s", buf);
   }
-
   if (ret == -1) {
     print_error_and_exit("read");
   }
-  buf[position] = 0;
-  printf("msg: %s", buf);
 }
 
 int main(int argc, char *argv[])
