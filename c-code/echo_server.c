@@ -23,6 +23,7 @@ static void echo(int sockfd) {
     int received = read(sockfd, buf, SIZE);
     printf("read %d bytes\n", received);
     if (received == 0) {
+      printf("connection closed\n");
       break;
     }
     if (received == -1) {
@@ -30,7 +31,7 @@ static void echo(int sockfd) {
     }
 
     buf[received] = 0;
-    /*printf("msg: %s", buf);*/
+    printf("read %d byts: %s", received, buf);
 
     int position = 0;
     int ret;
