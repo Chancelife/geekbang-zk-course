@@ -48,10 +48,10 @@ int main(int argc, char *argv[]) {
     print_error_and_exit("socket");
   }
 
-  int reuse = 1;
-  if (setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse)) == -1) {
-    print_error_and_exit("setsockopt");
-  }
+  /*int reuse = 1;*/
+  /*if (setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse)) == -1) {*/
+  /*  print_error_and_exit("setsockopt");*/
+  /*}*/
 
   struct sockaddr_in serv_addr = {0}; 
   serv_addr.sin_family = AF_INET;
