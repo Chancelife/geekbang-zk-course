@@ -13,8 +13,8 @@ int port = 5000;
 #define SIZE 1024
 
 static void print_error_and_exit(const char* api_name) {
-    perror(api_name);
-    exit(EXIT_FAILURE);
+  perror(api_name);
+  exit(EXIT_FAILURE);
 }
 
 static void write_all(int sockfd) {
@@ -32,18 +32,20 @@ static void write_all(int sockfd) {
 }
 
 static void read_all(int sockfd) {
+  printf("111\n");
   int position = 0;
   int ret;
   char buf[SIZE] = {0};
   while ((ret = read(sockfd, buf + position, SIZE - position)) > 0) {
-      position += ret;
+    printf("read %d\n", ret);
+    position += ret;
   }
 
   if (ret == -1) {
     print_error_and_exit("read");
   }
   buf[position] = 0;
-  printf("%s", buf);
+  printf("msg: %s", buf);
 }
 
 int main(int argc, char *argv[])

@@ -27,6 +27,9 @@ static void echo(int sockfd) {
       print_error_and_exit("read");
     }
 
+    buf[received] = 0;
+    printf("msg: %s", buf);
+
     int position = 0;
     int ret;
     while (position < received) {
@@ -54,19 +57,22 @@ int main(int argc, char *argv[]) {
   serv_addr.sin_family = AF_INET;
   serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
   serv_addr.sin_port = htons(port); 
-  printf("binding\n");
   if (bind(listenfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) == -1) {
     print_error_and_exit("bind");
   }
-  printf("listening\n");
+  printf("bound\n");
   if (listen(listenfd, BACKLOG) == -1) {
     print_error_and_exit("listen");
   }
+  printf("listened\n");
 
   int connfd;
   if ((connfd = accept(listenfd, (struct sockaddr*) NULL, NULL)) == -1) {
     print_error_and_exit("accept");
   }
+  printf("accepted\n");
+
+  echo(connfd);
 
   if (close(connfd) == -1) {
     print_error_and_exit("close");
