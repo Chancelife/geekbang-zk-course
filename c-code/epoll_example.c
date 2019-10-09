@@ -11,11 +11,20 @@
 #include <errno.h>
 
 #define MAXEVENTS 64
-char buf[512];
+#define BUF_SIZE 1024
+char buf[BUF_SIZE];
 char hbuf[NI_MAXHOST], sbuf[NI_MAXSERV];
 
 // Run the server "./a.out 5000". Open several consoles and run "nc 127.0.0.1 
 // 50000". Type some characters and hit return. Observe the server behaviour.
+
+struct send_buffer {
+  int fd;
+  char buf[BUF_SIZE];
+}
+
+#define BUF_COUNT
+struct send_buffer[BUF_COUNT];
 
 static void print_error_and_exit(const char* api_name) {
     perror(api_name);
@@ -121,9 +130,15 @@ static void read_all(int fd) {
             break;
         } 
         // Write the buffer to standard output
-        ret = write(STDOUT_FILENO, buf, count);
-        if (ret == -1) {
-            print_error_and_exit("write");
+        /*ret = write(STDOUT_FILENO, buf, count);*/
+        /*if (ret == -1) {*/
+        /*    print_error_and_exit("write");*/
+        /*}*/
+        int sent = 0;
+        while (sent < count) {
+          ret = write(fd, buf + send, count - sent);
+          if (ret == -1 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
+          }
         }
     }
 
