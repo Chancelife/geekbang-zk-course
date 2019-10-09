@@ -121,11 +121,9 @@ static void read_all(int fd) {
       done = 1;
       break;
     } 
-    // Write the buffer to standard output
-    ret = write(STDOUT_FILENO, buf, count);
-    if (ret == -1) {
-      print_error_and_exit("write");
-    }
+
+    buf[count] = 0;
+    printf("read %ld bytes: %s\n", count, buf);
   }
 
   if (done) {
