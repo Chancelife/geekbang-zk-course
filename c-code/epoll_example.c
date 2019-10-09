@@ -42,7 +42,7 @@ static void add_to_epoll_for_read(int efd, int fd) {
   make_socket_non_blocking(fd);
   struct epoll_event event;
   event.data.fd = fd;
-  event.events = EPOLLIN | EPOLLET;
+  event.events = EPOLLIN;
   int ret = epoll_ctl(efd, EPOLL_CTL_ADD, fd, &event);
   if (ret == -1) {
     print_error_and_exit("epoll_ctl");
